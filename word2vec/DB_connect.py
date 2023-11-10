@@ -15,8 +15,11 @@ class DB_connect:
     def select(self, sql):
         self.curs.execute(sql)
         data = self.curs.fetchall()
-        self.close()
         return data
+
+    def insert(self, sql, data):
+        self.curs.execute(sql, data)
+        self.conn.commit()
 
     def close(self):
         self.curs.close()
