@@ -1,5 +1,6 @@
 from gensim.models import Word2Vec
 import numpy as np
+import multiprocessing
 
 
 class Word2Vec_vectorizer:
@@ -8,7 +9,14 @@ class Word2Vec_vectorizer:
         self.vector_size = vector_size
 
     def model_train_save(self, text):
-        model = Word2Vec(text, vector_size=100, window=5, min_count=5, workers=4, sg=0)
+        model = Word2Vec(
+            text,
+            sg=1,
+            vector_size=300,
+            window=5,
+            min_count=1,
+            workers=multiprocessing.cpu_count(),
+        )
         model.save(self.model_path)
 
     def model_load(self):
@@ -22,4 +30,13 @@ class Word2Vec_vectorizer:
                 if word in model.wv.index_to_key:
                     line_vector_list.append(model.wv[word])
             text_vector_list.append(np.mean(line_vector_list, axis=0).tolist())
-        return np.mean(text_vector_list, axis=0).tolist()
+        max_length = max(len(vec) for vec in text_vector_list if isinstance(vec, list))
+        text_vector_list_padded = [
+            vec + [0] * (max_length - len(vec))
+            if isinstance(vec, list)
+            else [0] * max_length
+            for vec in text_vector_list
+        ]
+        result = np.mean(text_vector_list_padded, axis=0).tolist()
+        # print("Word2Vec :", result)
+        return result
