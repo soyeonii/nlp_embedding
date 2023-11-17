@@ -7,7 +7,7 @@ class DB_connect:
             host="localhost",
             user="root",
             password="1234",
-            db="nlp_movie_data",
+            db="movie_data",
             charset="utf8",
         )
         self.curs = self.conn.cursor()
